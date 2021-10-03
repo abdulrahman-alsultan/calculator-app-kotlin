@@ -1,6 +1,7 @@
 package com.example.calculatorapp
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,10 @@ import java.lang.Exception
 
 
 class MainActivity : AppCompatActivity() {
+
+    lateinit var sharedPre: SharedPreferences
+
+
     // numbers
     lateinit var one: Button
     lateinit var two: Button
@@ -43,6 +48,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        sharedPre = getSharedPreferences("AlsultanCalculator", MODE_PRIVATE)
+
         one = findViewById(R.id.one)
         two = findViewById(R.id.two)
         three = findViewById(R.id.three)
@@ -66,6 +73,8 @@ class MainActivity : AppCompatActivity() {
         dot = findViewById(R.id.dot)
 
         res = findViewById(R.id.result)
+
+        res.text = sharedPre.getString("operation", "")
 
         one.setOnClickListener{
             res.text = "${res.text}1"
@@ -168,9 +177,20 @@ class MainActivity : AppCompatActivity() {
                         res.text = txt.substring(0, len - lastNumber.length)+ "${(lastNumber.toFloat() * -1)}"
                     }
                 }
-
-
             }
         }
+    }
+    override fun onRestart() {
+        super.onRestart()
+        val ed: SharedPreferences.Editor = sharedPre.edit()
+        ed.putString("operation", res.text.toString())
+        ed.commit()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val ed: SharedPreferences.Editor = sharedPre.edit()
+        ed.putString("operation", res.text.toString())
+        ed.commit()
     }
 }
